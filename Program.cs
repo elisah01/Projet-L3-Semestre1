@@ -25,4 +25,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.Run();
+// Route racine pour tester
+app.MapGet("/", () => "Brasil Burger API est en ligne !");
+
+// Ecouter sur le port Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
