@@ -28,3 +28,4 @@ C:\Users\JOOXSOFT\Documents\SCHOOL\PROJET-SEMESTRE1\Csharp\Brasil-Burger\obj\Deb
 C:\Users\JOOXSOFT\Documents\SCHOOL\PROJET-SEMESTRE1\Csharp\Brasil-Burger\obj\Debug\net8.0\Brasil-Burger.pdb
 C:\Users\JOOXSOFT\Documents\SCHOOL\PROJET-SEMESTRE1\Csharp\Brasil-Burger\obj\Debug\net8.0\Brasil-Burger.genruntimeconfig.cache
 C:\Users\JOOXSOFT\Documents\SCHOOL\PROJET-SEMESTRE1\Csharp\Brasil-Burger\obj\Debug\net8.0\ref\Brasil-Burger.dll
+C:\Users\JOOXSOFT\Documents\SCHOOL\PROJET-SEMESTRE1\Csharp\Brasil-Burger\obj\Debug\net8.0\Brasil-Burger.sourcelink.json
