@@ -1,0 +1,14 @@
+# Build et binaires
+bin/
+obj/
+
+# Fichiers utilisateurs
+*.user
+*.suo
+
+# Secrets et configurations locales
+appsettings.Development.json
+.env
+
+# Autres
+.vscode/
