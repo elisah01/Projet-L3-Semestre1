@@ -33,7 +33,9 @@ ENV APP_ENV=prod
 # 6. Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-RUN chown -R www-data:www-data /var/www/html/var
+
+RUN mkdir -p /var/www/html/var \
+&& chown -R www-data:www-data /var/www/html/var
 
 # 8. Apache doit écouter le port Render
 RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf \
