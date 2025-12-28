@@ -29,6 +29,9 @@ COPY . .
 
 # 5. Variables d’environnement Symfony
 ENV APP_ENV=prod
+ENV APP_DEBUG=0
+ENV APP_RUNTIME_ENV=prod
+ENV APP_DOTENV=0
 
 # 6. Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-scripts
