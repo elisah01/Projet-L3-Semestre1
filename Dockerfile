@@ -1,5 +1,4 @@
-# Utiliser PHP 8.2 avec Apache
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 # 1. Installer les dépendances système requises
 RUN apt-get update && apt-get install -y \
@@ -15,7 +14,6 @@ RUN apt-get update && apt-get install -y \
     zip \
     opcache
 
-# 2. Activer le module rewrite (Symfony)
 RUN a2enmod rewrite
 
 # 3. Configurer le DocumentRoot vers /public
@@ -33,14 +31,12 @@ COPY . .
 ENV APP_ENV=prod
 
 # 6. Installer les dépendances PHP
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# 7. Permissions cache/logs
 RUN chown -R www-data:www-data /var/www/html/var
 
 # 8. Apache doit écouter le port Render
 RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf \
  && sed -i 's/:80/:${PORT}/g' /etc/apache2/sites-available/000-default.conf
 
-# 9. Exposer le port Render
 EXPOSE ${PORT}
