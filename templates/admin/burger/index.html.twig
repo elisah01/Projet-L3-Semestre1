@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="p-8 bg-[#f8f9fa] min-h-screen">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">Gestion des Burgers</h1>
+        <a href="#" class="bg-[#ff3b3b] text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-red-600">
+            <i class="fas fa-plus"></i> Ajouter un burger
+        </a>
+    </div>
+
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-50">
+            <input type="text" placeholder="Rechercher un burger..." class="w-full max-w-md px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-yellow-400">
+        </div>
+
+        <table class="w-full">
+            <thead class="bg-gray-50 text-gray-400 text-[11px] uppercase tracking-widest font-bold">
+                <tr>
+                    <th class="px-8 py-4 text-left">Image</th>
+                    <th class="px-6 py-4 text-left">Nom</th>
+                    <th class="px-6 py-4 text-left">Description</th>
+                    <th class="px-6 py-4 text-left">Prix</th>
+                    <th class="px-8 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for burger in burgers %}
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-8 py-4">
+                            <img src="{{ burger.image_url|default(asset('images/burgers/classic.jpg')) }}" 
+                                class="w-14 h-14 rounded-2xl object-cover shadow-sm">
+                        </td>
+                        <td class="px-6 py-4 font-bold text-gray-700">{{ burger.nom }}</td>
+                        <td class="px-6 py-4 text-gray-500 text-sm italic">
+                            {{ burger.description|default('Burger savoureux, un pur delice') }}
+                        </td>
+                        <td class="px-6 py-4 font-bold text-gray-700">
+                            {{ burger.prix|number_format(0, '.', ' ') }} FCFA
+                        </td>
+                        <td class="px-8 py-4 text-right space-x-2">
+                            <button class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg"><i class="far fa-edit"></i></button>
+                            <button class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="far fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">
+                            Aucun burger trouvé en base de données.
+                        </td>
+                    </tr>
+                {% endfor %} 
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

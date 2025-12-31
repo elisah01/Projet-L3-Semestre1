@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="p-8 bg-[#f8f9fa] min-h-screen">
+    <h1 class="text-2xl font-bold text-gray-800 mb-8">Gestion des Commandes</h1>
+
+    {# Formulaire de Filtre #}
+    <form method="get" class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-6 flex gap-4">
+        <div class="flex-1">
+            <input type="text" name="client" value="{{ app.request.query.get('client') }}" placeholder="Téléphone client..." class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-400">
+        </div>
+        <select name="etat" class="px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-red-400">
+            <option value="">Tous les états</option>
+            <option value="EN_COURS" {{ app.request.query.get('etat') == 'EN_COURS' ? 'selected' }}>En cours</option>
+            <option value="VALIDE" {{ app.request.query.get('etat') == 'VALIDE' ? 'selected' }}>Validée</option>
+            <option value="ANNULEE" {{ app.request.query.get('etat') == 'ANNULEE' ? 'selected' }}>Annulée</option>
+            <option value="TERMINE" {{ app.request.query.get('etat') == 'TERMINE' ? 'selected' }}>Terminée</option>
+        </select>
+        <input type="date" name="date" value="{{ app.request.query.get('date') }}" class="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-400">
+        <button type="submit" class="bg-gray-800 text-white px-6 rounded-2xl hover:bg-black transition-colors">Filtrer</button>
+    </form>
+
+    <div class="bg-white rounded-[2rem] shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-400 uppercase text-[10px] font-bold">
+                <tr>
+                    <th class="px-6 py-4 text-left">Commande</th>
+                    <th class="px-6 py-4 text-left">Date</th>
+                    <th class="px-6 py-4 text-left">Client</th>
+                    <th class="px-6 py-4 text-left">Montant</th>
+                    <th class="px-6 py-4 text-left">État</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for cmd in commandes %}
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-6 font-bold text-gray-800 uppercase">CMD-{{ cmd.id }}</td>
+                    <td class="px-6 py-6 text-gray-500">{{ cmd.date_commande|date('d/m/Y H:i') }}</td>
+                    <td class="px-6 py-6">
+                        <div class="font-bold text-gray-700">{{ cmd.prenom }} {{ cmd.nom }}</div>
+                        <div class="text-xs text-gray-400">{{ cmd.telephone }}</div>
+                    </td>
+                    <td class="px-6 py-6 font-bold text-gray-900">{{ cmd.total|number_format(0, '.', ' ') }} FCFA</td>
+                    <td class="px-6 py-6">
+                        {% set statusClasses = {
+                            'EN_COURS': 'bg-blue-50 text-blue-600',
+                            'VALIDE': 'bg-green-50 text-green-600',
+                            'ANNULEE': 'bg-red-50 text-red-600',
+                            'TERMINE': 'bg-purple-50 text-purple-600'
+                        } %}
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase {{ statusClasses[cmd.etat] | default('bg-gray-50 text-gray-600') }}">
+                            {{ cmd.etat }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-6 text-right space-x-3">
+                        <a href="{{ path('admin_commande_detail', {id: cmd.id}) }}" title="Détails">
+                            <i class="far fa-eye text-blue-500 hover:text-blue-700"></i>
+                        </a>
+                        {% if cmd.etat == 'EN_COURS' %}
+                            <a href="{{ path('admin_commande_terminer', {id: cmd.id}) }}" title="Terminer" onclick="return confirm('Terminer cette commande ?')">
+                                <i class="fas fa-check text-green-500 hover:text-green-700"></i>
+                            </a>
+                            <a href="{{ path('admin_commande_annuler', {id: cmd.id}) }}" title="Annuler" class="text-red-500 hover:text-red-700" onclick="return confirm('Annuler cette commande ?')">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">Aucune commande trouvée.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+            <p class="text-xs text-gray-400 font-medium uppercase">
+                Affichage de {{ commandes|length }} sur {{ total }} commandes
+            </p>
+            
+            <div class="flex gap-2">
+                {% if currentPage > 1 %}
+                    <a href="{{ path('admin_commande_index', app.request.query.all|merge({'page': currentPage - 1})) }}" 
+                    class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">
+                        Précédent
+                    </a>
+                {% endif %}
+
+                <div class="flex gap-1">
+                    {% for i in 1..pagesCount %}
+                        <a href="{{ path('admin_commande_index', app.request.query.all|merge({'page': i})) }}" 
+                        class="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all 
+                        {{ i == currentPage ? 'bg-red-500 text-white shadow-lg shadow-red-200' : 'bg-white border border-gray-200 text-gray-400 hover:bg-gray-50' }}">
+                            {{ i }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if currentPage < pagesCount %}
+                    <a href="{{ path('admin_commande_index', app.request.query.all|merge({'page': currentPage + 1})) }}" 
+                    class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">
+                        Suivant
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

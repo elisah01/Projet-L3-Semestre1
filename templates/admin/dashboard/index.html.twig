@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="mb-8">
+        <h3 class="text-xl font-bold text-gray-800">Tableau de bord</h3>
+        <p class="text-gray-500 text-xs">Vue d'ensemble de votre activité aujourd'hui</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        {{ _self.kpi_card('Commandes en cours', stats.commandes_en_cours, 'fa-shopping-bag', 'blue', '+ 0%') }}
+        {{ _self.kpi_card('Commandes validées', stats.commandes_validees, 'fa-check-double', 'green', '+ 0%') }}
+        {{ _self.kpi_card('Recettes du jour', stats.recette_journaliere|number_format(0, '.', ' ') ~ ' FCFA', 'fa-dollar-sign', 'yellow', '+ 0%') }}
+        {{ _self.kpi_card('Commandes annulées', stats.commandes_annulees, 'fa-times-circle', 'red', '0') }}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-50">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="font-bold text-gray-700 text-sm">Recettes de la semaine</h4>
+                <i class="fas fa-chart-line text-green-400"></i>
+            </div>
+            <canvas id="chartRecettes" height="150"></canvas>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-50">
+            <h4 class="font-bold text-gray-700 text-sm mb-6">Produits les plus vendus</h4>
+            <canvas id="chartProduits" height="150"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden">
+        <div class="p-5 border-b border-gray-50 flex justify-between items-center">
+            <h4 class="font-bold text-gray-700 text-sm">Commandes récentes</h4>
+            <a href="{{ path('admin_commande_index') }}" class="text-xs font-bold text-red-500">Voir toutes</a>
+        </div>
+        <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50 text-gray-400 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th class="px-6 py-4">Commande</th>
+                    <th class="px-6 py-4">Client</th>
+                    <th class="px-6 py-4 text-center">Articles</th>
+                    <th class="px-6 py-4">Total</th>
+                    <th class="px-6 py-4">État</th>
+                    <th class="px-6 py-4 text-right">Heure</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for cmd in stats.commandes_recentes %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-bold text-gray-600 uppercase">CMD-{{ cmd.id }}</td>
+                    <td class="px-6 py-4 text-gray-700 font-medium">
+                        {{ cmd.prenom }} {{ cmd.nom }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="font-medium text-gray-700">
+                            {{ cmd.total_burgers }} {{ cmd.total_burgers > 1 ? 'burgers' : 'burger' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-800">
+                        {# Correction : utilisation de cmd.total au lieu de cmd.prixTotal #}
+                        {{ cmd.total|number_format(0, '.', ' ') }} FCFA
+                    </td>
+                    <td class="px-6 py-4">
+                        {% set color = cmd.etat == 'VALIDE' or cmd.etat == 'TERMINE' ? 'green' : (cmd.etat == 'ANNULEE' ? 'red' : 'blue') %}
+                        <span class="px-3 py-1 bg-{{ color }}-50 text-{{ color }}-500 rounded-full text-[10px] font-bold">
+                            {{ cmd.etat }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right text-gray-400">
+                        {# Correction : utilisation de cmd.date_commande au lieu de cmd.createdAt #}
+                        <i class="far fa-clock mr-1"></i> {{ cmd.date_commande|date('H:i') }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">Aucune commande aujourd'hui</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% macro kpi_card(label, value, icon, color, trend) %}
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-50 flex flex-col justify-between h-32 relative">
+        <div class="flex justify-between items-start">
+            <div class="bg-{{ color }}-50 text-{{ color }}-500 p-2 rounded-lg text-sm">
+                <i class="fas {{ icon }}"></i>
+            </div>
+            <span class="text-[10px] font-bold text-{{ color == 'red' ? 'red' : 'green' }}-500">{{ trend }}</span>
+        </div>
+        <div>
+            <h5 class="text-3xl font-black text-gray-800">{{ value }}</h5>
+            <p class="text-[11px] text-gray-400 font-medium">{{ label }}</p>
+        </div>
+    </div>
+{% endmacro %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Graphique des recettes (données statiques pour l'instant)
+    new Chart(document.getElementById('chartRecettes'), {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            datasets: [{
+                data: [120000, 140000, 130000, 150000, 180000, 240000, 190000],
+                borderColor: '#ef4444', borderWidth: 2, tension: 0.4, pointRadius: 0, fill: false
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { display: true }, x: { grid: { display: false } } } }
+    });
+
+    // Graphique des produits les plus vendus (données dynamiques)
+    const labelsProduits = {{ stats.burgers_plus_vendus|map(p => p.nom)|json_encode|raw }};
+    const dataProduits = {{ stats.burgers_plus_vendus|map(p => p.quantite)|json_encode|raw }};
+
+    new Chart(document.getElementById('chartProduits'), {
+        type: 'bar',
+        data: {
+            labels: labelsProduits.length ? labelsProduits : ['Aucune vente'],
+            datasets: [{
+                label: 'Quantité',
+                data: dataProduits.length ? dataProduits : [0],
+                backgroundColor: '#facc15', borderRadius: 4
+            }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+</script>
+{% endblock %}

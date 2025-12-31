@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="p-8 bg-[#f8f9fa] min-h-screen">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">Zones & Livreurs</h1>
+        <button class="bg-[#ff3b3b] text-white px-6 py-2 rounded-xl font-bold">+ Ajouter une zone</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {% for zone, prix in {'Plateau': '1500', 'Almadies': '2000', 'Mermoz': '1000'} %}
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 flex justify-between items-center hover:border-blue-200 transition-all cursor-pointer">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <div class="font-bold text-gray-800">{{ zone }}</div>
+                    <div class="text-red-500 text-xs font-bold">{{ prix }} FCFA</div>
+                </div>
+            </div>
+            <i class="far fa-edit text-blue-500"></i>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="bg-white p-8 rounded-[3rem] shadow-sm">
+        <h2 class="font-bold text-gray-800 mb-6">Assignation des livreurs</h2>
+
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-400 uppercase text-[10px] font-bold">
+                <tr>
+                    <th class="px-6 py-4 text-left">Livreur</th>
+                    <th class="px-6 py-4 text-left">Zone Assignée</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for livreur, zone in {'Mamadou Diop': 'Plateau', 'Awa Ndiaye': 'Almadies', 'Ousmane Fall': 'Mermoz'} %}
+                <tr>
+                    <td class="px-6 py-6 font-bold text-gray-800">{{ livreur }}</td>
+                    <td class="px-6 py-6 text-gray-600">{{ zone }}</td>
+                    <td class="px-6 py-6 text-right">
+                        <button class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg"><i class="far fa-edit"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+        {# Tableau d'assignation ici #}
+    </div>
+</div>
+{% endblock %}

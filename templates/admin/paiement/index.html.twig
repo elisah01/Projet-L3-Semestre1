@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="p-8 bg-[#f8f9fa] min-h-screen">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">Gestion des Paiements</h1>
+        <button class="bg-[#2ecc71] text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-green-600 transition-colors">
+            <i class="fas fa-file-csv"></i> Exporter CSV
+        </button>
+    </div>
+
+    {% set totalEncaisse = 0 %}
+    {% for p in paiements %}{% set totalEncaisse = totalEncaisse + p.montant %}{% endfor %}
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {{ _self.stat_card('Paiements', paiements|length, 'fa-check', 'green') }}
+        {{ _self.stat_card('En attente', '0', 'fa-clock', 'yellow') }}
+        {{ _self.stat_card('Échoués', '0', 'fa-times', 'red') }}
+        {{ _self.stat_card('Total encaissé', totalEncaisse|number_format(0, '.', ' ') ~ ' F', 'fa-wallet', 'blue') }}
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <form method="get" class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-gray-50">
+            <select name="mode" class="bg-gray-50 border-none rounded-2xl py-3 text-sm px-4 focus:ring-2 focus:ring-green-400">
+                <option value="">Toutes les méthodes</option>
+                <option value="WAVE" {{ app.request.query.get('mode') == 'WAVE' ? 'selected' }}>Wave</option>
+                <option value="ORANGE_MONEY" {{ app.request.query.get('mode') == 'ORANGE_MONEY' ? 'selected' }}>Orange Money</option>
+            </select>
+            <div class="flex gap-2">
+                <input type="date" name="date" value="{{ app.request.query.get('date') }}" class="flex-1 bg-gray-50 border-none rounded-2xl py-3 text-sm px-4 focus:ring-2 focus:ring-green-400">
+                <button type="submit" class="bg-gray-800 text-white px-6 rounded-2xl hover:bg-black transition-colors">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </form>
+
+        <table class="w-full">
+            <thead class="bg-gray-50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
+                <tr>
+                    <th class="px-6 py-4 text-left">Date/Heure</th>
+                    <th class="px-6 py-4 text-left">Commande</th>
+                    <th class="px-6 py-4 text-left">Montant</th>
+                    <th class="px-6 py-4 text-left">Méthode</th>
+                    <th class="px-6 py-4 text-left">Statut</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 text-sm">
+                {% for p in paiements %}
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-6 text-gray-500">{{ p.date_paiement|date('d/m/Y H:i') }}</td>
+                    <td class="px-6 py-6 font-bold text-blue-600">CMD-{{ p.commande_id }}</td>
+                    <td class="px-6 py-6 font-bold text-gray-700">{{ p.montant|number_format(0, '.', ' ') }} FCFA</td>
+                    <td class="px-6 py-6">
+                        {% set modeLabel =  (p.mode == 'WAVE' ? 'Wave' : 'OM') %}
+                        <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold">{{ modeLabel }}</span>
+                    </td>
+                    <td class="px-6 py-6">
+                        <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[10px] font-bold">Validé</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-10 text-center text-gray-400 italic">Aucun paiement trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% macro stat_card(label, val, icon, color) %}
+    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+        <div class="w-12 h-12 bg-{{ color }}-50 text-{{ color }}-500 rounded-2xl flex items-center justify-center mb-4">
+            <i class="fas {{ icon }}"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-800">{{ val }}</div>
+        <div class="text-gray-400 text-xs font-medium uppercase">{{ label }}</div>
+    </div>
+{% endmacro %}
+{% endblock %}
