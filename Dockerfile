@@ -33,7 +33,7 @@ ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
 # Installer les dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var
