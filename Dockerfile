@@ -25,8 +25,11 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+
 WORKDIR /var/www/html
 COPY . .
+RUN touch .env
+
 
 # Environnement prod
 ENV APP_ENV=prod
