@@ -2,8 +2,20 @@
 
 use App\Kernel;
 
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] ?? 'prod';
+$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? '0';
 
-return function (array $context) {
-    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
-};
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+$kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$kernel->boot();
+
+$response = $kernel->handle(
+    Symfony\Component\HttpFoundation\Request::createFromGlobals()
+);
+
+$response->send();
+$kernel->terminate(
+    Symfony\Component\HttpFoundation\Request::createFromGlobals(),
+    $response
+);
