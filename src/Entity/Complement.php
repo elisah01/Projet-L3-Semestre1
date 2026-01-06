@@ -17,7 +17,7 @@ class Complement
     private string $nom;
 
     #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
-    private float $prix;
+    private string $prix;
 
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $image_url = null;

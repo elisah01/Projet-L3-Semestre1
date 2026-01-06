@@ -17,8 +17,8 @@ class Paiement
     #[ORM\JoinColumn(name: "commande_id")]
     private Commande $commande;
 
-    #[ORM\Column(type: "numeric", precision: 10, scale: 2)]
-    private float $montant;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    private string $montant;
 
     #[ORM\Column(type: "datetime")]
     private \DateTime $date_paiement;

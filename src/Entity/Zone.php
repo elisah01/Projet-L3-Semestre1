@@ -16,8 +16,9 @@ class Zone
     #[ORM\Column(length: 100)]
     private string $nom;
 
-    #[ORM\Column(type: "numeric", precision: 10, scale: 2)]
-    private float $prix;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    private string $prix;
+
 
     public function getId(): ?int { return $this->id; }
     public function getNom(): string { return $this->nom; }
